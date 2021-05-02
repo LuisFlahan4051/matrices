@@ -2,4 +2,6 @@ Para probar el código se necesita tener Golang instalado y ejecutar el siguient
 
 ```
 > go get github.com/fatih/color
+> go build main.go
+> main.exe
 ```
