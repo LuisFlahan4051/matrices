@@ -32,7 +32,13 @@ func generar_numero_random(numero_inicial int, numero_final int) int {
 	return numero_aleatorio
 }
 
-func generar_matriz_cuadrada_aleatoria(tamanio int, numero_aleatorio_inicial int, numero_aleatorio_final int) [][]int {
+func generar_matriz_cuadrada_aleatoria(tamanio int, numero_aleatorio_inicial int, numero_aleatorio_final int) ([][]int, error) {
+	var err error
+	if tamanio < 2 {
+		err = errors.New("no se pueden generar matrices de dimensiones menores 2 por 2")
+		return nil, err
+	}
+	err = nil
 
 	matriz := make([][]int, tamanio)
 
@@ -42,7 +48,7 @@ func generar_matriz_cuadrada_aleatoria(tamanio int, numero_aleatorio_inicial int
 			matriz[i][j] = generar_numero_random(numero_aleatorio_inicial, numero_aleatorio_final)
 		}
 	}
-	return matriz
+	return matriz, nil
 }
 
 func obtener_filas_columnas(matriz [][]int) (int, int) {
@@ -107,13 +113,8 @@ func escalar_por_matriz(escalar int, matriz [][]int) [][]int {
 
 func generar_matriz_nxm_aleatoria(filas int, columnas int, numero_aleatorio_inicial int, numero_aleatorio_final int) ([][]int, error) {
 	var err error
-	if filas == 0 || columnas == 0 {
-		if filas == 0 {
-			err = errors.New("no se pueden generar matrices de dimensiones n por 0")
-		}
-		if columnas == 0 {
-			err = errors.New("no se pueden generar matrices de dimensiones 0 por m")
-		}
+	if filas < 2 || columnas < 2 {
+		err = errors.New("no se pueden generar matrices de dimensiones menores 2 por 2")
 		return nil, err
 	}
 	err = nil
@@ -203,8 +204,16 @@ func programa_1() bool {
 	numero_aleatorio_inicial := 0
 	numero_aleatorio_final := 10
 
-	matriz_2 := generar_matriz_cuadrada_aleatoria(tamanio, numero_aleatorio_inicial, numero_aleatorio_final)
-	matriz_1 := generar_matriz_cuadrada_aleatoria(tamanio, numero_aleatorio_inicial, numero_aleatorio_final)
+	matriz_2, err := generar_matriz_cuadrada_aleatoria(tamanio, numero_aleatorio_inicial, numero_aleatorio_final)
+	if err != nil {
+		fmt.Println(err)
+		return false
+	}
+	matriz_1, err := generar_matriz_cuadrada_aleatoria(tamanio, numero_aleatorio_inicial, numero_aleatorio_final)
+	if err != nil {
+		fmt.Println(err)
+		return false
+	}
 	matriz_resultado, err := sumar_matrices(matriz_1, matriz_2)
 	if err != nil {
 		fmt.Println(err)
@@ -238,10 +247,14 @@ func programa_1() bool {
 	return true
 }
 
-func programa_2() {
+func programa_2() bool {
 	escalar := 5
 	tamanio := 4
-	matriz := generar_matriz_cuadrada_aleatoria(tamanio, 1, 10)
+	matriz, err := generar_matriz_cuadrada_aleatoria(tamanio, 1, 10)
+	if err != nil {
+		fmt.Println(err)
+		return false
+	}
 	matriz_resultado := escalar_por_matriz(escalar, matriz)
 
 	color.Set(color.FgHiMagenta)
@@ -256,6 +269,7 @@ func programa_2() {
 	println("Matríz resultado:")
 	color.Unset()
 	imprimir_matriz(matriz_resultado)
+	return true
 }
 
 func programa_3() bool {
@@ -300,7 +314,11 @@ func programa_3() bool {
 
 func programa_4() bool {
 	tamanio := 4
-	matriz := generar_matriz_cuadrada_aleatoria(tamanio, 1, 10)
+	matriz, err := generar_matriz_cuadrada_aleatoria(tamanio, 1, 10)
+	if err != nil {
+		fmt.Println(err)
+		return false
+	}
 	traza, err := obtener_traza(matriz)
 	if err != nil {
 		println(err)
@@ -339,8 +357,154 @@ func programa_5() bool {
 	return true
 }
 
-func test() {
-	println("Seccioón para hacer pruebas.")
+func test() bool {
+	color.Set(color.FgYellow)
+	println("Probar creación de matrices y operaciones.")
+	println("Genere la primera matriz para comenzar.")
+	fmt.Printf("\nSeleccione la matriz que desea:\n")
+	fmt.Printf("\n\t(1)Matriz cuadrada aleatoria. (2)Matriz NxM aleatoria.\n> ")
+	color.Unset()
+	opcion := 0
+	fmt.Scan(&opcion)
+
+	matriz := [][]int{}
+
+	switch opcion {
+	case 1:
+		color.Set(color.FgYellow)
+		fmt.Printf("\nIngrese el tamaño de la matriz cuadrada:\n> ")
+		color.Unset()
+		tamanio := 0
+		fmt.Scan(&tamanio)
+		color.Set(color.FgYellow)
+		fmt.Printf("\nGenerar numeros aleatorios desde:\n> ")
+		color.Unset()
+		var desde int
+		fmt.Scan(&desde)
+		color.Set(color.FgYellow)
+		fmt.Printf("\nHasta:\n> ")
+		color.Unset()
+		var hasta int
+		fmt.Scan(&hasta)
+		matriz_1, err := generar_matriz_cuadrada_aleatoria(tamanio, desde, hasta)
+		matriz = matriz_1
+		if err != nil {
+			fmt.Println(err)
+			return false
+		}
+		color.Set(color.FgMagenta)
+		fmt.Printf("\nMatriz inicial:\n")
+		color.Unset()
+		imprimir_matriz(matriz_1)
+	case 2:
+		color.Set(color.FgYellow)
+		fmt.Printf("\nIngrese las filas de la matriz:\n> ")
+		color.Unset()
+		filas := 0
+		fmt.Scan(&filas)
+		color.Set(color.FgYellow)
+		fmt.Printf("\nIngrese las columnas de la matriz:\n> ")
+		color.Unset()
+		columnas := 0
+		fmt.Scan(&columnas)
+		color.Set(color.FgYellow)
+		fmt.Printf("\nGenerar numeros aleatorios desde:\n> ")
+		color.Unset()
+		var desde int
+		fmt.Scan(&desde)
+		color.Set(color.FgYellow)
+		fmt.Printf("\nHasta:\n> ")
+		color.Unset()
+		var hasta int
+		fmt.Scan(&hasta)
+		matriz_1, err := generar_matriz_nxm_aleatoria(filas, columnas, desde, hasta)
+		matriz = matriz_1
+		if err != nil {
+			fmt.Println(err)
+			return false
+		}
+		color.Set(color.FgMagenta)
+		fmt.Printf("\nMatriz inicial:\n")
+		color.Unset()
+		imprimir_matriz(matriz_1)
+	default:
+		println("No existe la opción.")
+	}
+
+	for {
+		bandera := 0
+		color.Set(color.FgYellow)
+		println("¿Qué operación desea ejecutar?")
+		fmt.Printf("\n\t(1)Transpuesta.		   	(2)Traza.")
+		fmt.Printf("\n\t(3)Sumar otra matriz.   (4)Restar otra matriz.")
+		fmt.Printf("\n\t(5)Multiplicar escalar.	(6)Multiplicar por otra matriz.\n> ")
+		color.Unset()
+		fmt.Scan(&opcion)
+		switch opcion {
+		case 1:
+			color.Set(color.FgMagenta)
+			println("Matriz transpuesta:")
+			color.Unset()
+			imprimir_matriz(obtener_transpuesta(matriz))
+		case 2:
+			traza, err := obtener_traza(matriz)
+			if err != nil {
+				fmt.Println(err)
+				return false
+			}
+			color.Set(color.FgHiMagenta)
+			println("Traza:")
+			color.Unset()
+			println(traza)
+		case 3:
+			matriz_resultado, err := sumar_matrices(matriz, matriz)
+			if err != nil {
+				fmt.Println(err)
+				return false
+			}
+			color.Set(color.FgMagenta)
+			println("Matriz resultado:")
+			color.Unset()
+			imprimir_matriz(obtener_transpuesta(matriz_resultado))
+		case 4:
+			matriz_resultado, err := restar_matrices(matriz, matriz)
+			if err != nil {
+				fmt.Println(err)
+				return false
+			}
+			color.Set(color.FgMagenta)
+			println("Matriz resultado:")
+			color.Unset()
+			imprimir_matriz(obtener_transpuesta(matriz_resultado))
+		case 5:
+			color.Set(color.FgYellow)
+			fmt.Printf("\nIngrese el escalar:\n> ")
+			color.Unset()
+			var escalar int
+			fmt.Scan(&escalar)
+			color.Set(color.FgMagenta)
+			println("Matriz resultado:")
+			color.Unset()
+			imprimir_matriz(escalar_por_matriz(escalar, matriz))
+		case 6:
+			matriz_resultado, err := multiplicar_matrices(matriz, matriz)
+			if err != nil {
+				fmt.Println(err)
+				return false
+			}
+			color.Set(color.FgMagenta)
+			println("Matriz resultado:")
+			color.Unset()
+			imprimir_matriz(obtener_transpuesta(matriz_resultado))
+		default:
+			bandera = 1
+		}
+		if bandera != 0 {
+			break
+		}
+	}
+
+	return true
 }
 
 func main() {
